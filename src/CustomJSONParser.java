@@ -25,11 +25,11 @@ public class CustomJSONParser {
         return data.arrayMap.get(key);
     }
 
-    public float getFloat(String key) {
+    public Float getFloat(String key) {
         return data.floatMap.get(key);
     }
 
-    public int getInt(String key) {
+    public Integer getInt(String key) {
         return data.intMap.get(key);
     }
 
@@ -52,9 +52,9 @@ public class CustomJSONParser {
     }
 
     public int maxDepth() {
-        int max = depth;
+        int max = 1;
         for (CustomJSONParser child : children) {
-            int childMaxDepth = child.maxDepth();
+            int childMaxDepth = 1 + child.maxDepth();
             if (childMaxDepth > max) {
                 max = childMaxDepth;
             }
@@ -67,8 +67,6 @@ public class CustomJSONParser {
     private static final char SEPARATOR = ',', OBJ_START = '{', OBJ_END = '}', ARR_START = '[', ARR_END = ']', STRING_MARKER = '\'', VAL_MARKER = ':', FLOAT_MARKER = '.';
 
     private DataMaps data;
-
-    private int depth;
 
     private String asString;
 
@@ -126,10 +124,7 @@ public class CustomJSONParser {
 
     private CustomJSONParser(String s, CustomJSONParser parent) {
 
-        if (parent == null) {
-            depth = 1;
-        } else {
-            depth = parent.depth + 1;
+        if (parent != null) {
             parent.children.add(this);
         }
 
@@ -145,7 +140,7 @@ public class CustomJSONParser {
         //loop while ______
         do {
             //get the key by searching from the current position to the next colon
-            String key = s.substring(idx + 1, s.indexOf(VAL_MARKER, idx)).trim();
+            String key = s.substring(idx = idx + 1, s.indexOf(VAL_MARKER, idx)).trim();
 
             //put the marker in the position one after the colon
             idx += key.length() + 1;
@@ -163,14 +158,15 @@ public class CustomJSONParser {
             switch (getType(currChar)) {
                 case STRING:
                     data.putString(key,
-                            s.substring(idx + 1, idx = s.indexOf(STRING_MARKER, idx))
+                            s.substring(idx = idx + 1, idx = s.indexOf(STRING_MARKER, idx))
                     );
                     break;
                 case NUMBER:
                     int start = idx;
                     boolean isFloat = false;
-                    while (Character.isDigit(currChar = s.charAt(idx)) || currChar == FLOAT_MARKER ? isFloat = true : false) {
+                    while (Character.isDigit(currChar) || ((currChar == FLOAT_MARKER) ? (isFloat = true) : false)) {
                         idx++;
+                        currChar = s.charAt(idx);
                     }
 
                     String number = s.substring(start, idx);
@@ -193,7 +189,7 @@ public class CustomJSONParser {
             idx = s.indexOf(SEPARATOR, idx) + 1;
             //now, idx is one space after the next comma
 
-        } while (s.indexOf(SEPARATOR, idx) > -1);
+        } while (idx > 0);
     }
 
     private List<Object> getArray(String s) {
@@ -216,13 +212,14 @@ public class CustomJSONParser {
 
             switch (getType(currChar)) {
                 case STRING:
-                    array.add(s.substring(idx + 1, idx = s.indexOf(STRING_MARKER, idx)));
+                    array.add(s.substring(idx = idx + 1, idx = s.indexOf(STRING_MARKER, idx)));
                     break;
                 case NUMBER:
                     int start = idx;
                     boolean isFloat = false;
-                    while (Character.isDigit(currChar = s.charAt(idx)) || currChar == FLOAT_MARKER ? isFloat = true : false) {
+                    while (Character.isDigit(currChar) || currChar == FLOAT_MARKER ? isFloat = true : false) {
                         idx++;
+                        currChar = s.charAt(idx);
                     }
 
                     String number = s.substring(start, idx);
@@ -245,7 +242,7 @@ public class CustomJSONParser {
             idx = s.indexOf(SEPARATOR, idx) + 1;
             //now, idx is one space after the next comma
 
-        } while (s.indexOf(SEPARATOR, idx) > -1);
+        } while (idx > 0);
 
         return array;
 
@@ -281,8 +278,6 @@ public class CustomJSONParser {
 
     private static int getBoundedValue(String s, int start, final char START_STRING, final char END_STRING) {
         int closedVal = 1;
-
-        start = s.indexOf(START_STRING);
 
         while (closedVal > 0) {
             //shift start one ahead of starting brace
