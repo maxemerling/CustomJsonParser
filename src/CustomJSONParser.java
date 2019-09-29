@@ -299,9 +299,4 @@ public class CustomJSONParser {
 
         return start;
     }
-
-    public static void main(String[] args) {
-        String test = "{weather:  ’good’, food: 'banana', colors: [blue, yellow, red], object: {name: 'insideObj'}}";
-        System.out.println(test.substring(0, 1 + getArrayEnd(test, 0)));
-    }
 }
