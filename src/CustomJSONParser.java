@@ -1,6 +1,3 @@
-import sun.awt.X11.XSystemTrayPeer;
-
-import javax.xml.crypto.Data;
 import java.util.*;
 
 enum VALUE {
@@ -164,7 +161,7 @@ public class CustomJSONParser {
                 case NUMBER:
                     int start = idx;
                     boolean isFloat = false;
-                    while (Character.isDigit(currChar) || ((currChar == FLOAT_MARKER) ? (isFloat = true) : false)) {
+                    while (Character.isDigit(currChar) || ((currChar == FLOAT_MARKER) && (isFloat = true))) { //note how isFloat is set to true only if currChat==FLOAT_MARKER
                         idx++;
                         currChar = s.charAt(idx);
                     }
